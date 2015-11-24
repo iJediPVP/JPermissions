@@ -1,0 +1,20 @@
+name: JPermissions
+version: 1.0.0
+main: me.ijedi.jpermissions.Main
+author: i_Jedi
+website: www.ijedi.me
+commands:
+  JPERM:
+    usage: /jperm
+    aliases: [jp, JP]
+  TEST:
+
+permissions:
+#/jp permissoins
+jp.player:
+  description: Modify player permissions and groups
+jp.group:
+  description: Modify groups
+jp.reload:
+  description: Reload permissions
+

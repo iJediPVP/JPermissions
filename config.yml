@@ -1,0 +1,9 @@
+# JediPermission by i_Jedi
+# Enable or disable the plugin.
+enabled: true
+
+# Character to use infront of color codes for suffixes/prefixes
+colorChar: '&'
+
+# Character to use infront of negative permission nodes
+negativeChar: '^'

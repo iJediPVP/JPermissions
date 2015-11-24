@@ -1,0 +1,18 @@
+# Groups for JPermissions
+# Add permissions for each group.
+# Add children for each group. This group will inherit that child's permissions.
+# Please know that this group does not inherit permissions of a child's child.
+# Set prefix's and suffix's for each group.
+# The group's rank determines if it's prefix/suffix will be shown for players who inherit this group.
+# A group with a rank of 0 will not show a prefix/suffix
+# If a player has two groups with the same rank, the first group listed for them should be shown.
+
+default:
+  permissions:
+  - jp.player
+  - jp.group
+  - jp.reload
+  children: []
+  prefix: Default
+  suffix: Default
+  rank: 1
