@@ -116,6 +116,9 @@ public class GroupManager {
             addGroup(group);
         }
     }
+    public Set<String> getGroupSet(){
+        return groupMap.keySet();
+    }
 
     //Users
     public boolean hasUser(UUID uuid){
@@ -139,6 +142,11 @@ public class GroupManager {
             return userMap.get(uuid);
         }
         throw new NullPointerException("User not found");
+    }
+    public void resetUsers(){
+        for(User user : userMap.values()){
+            user.reset();
+        }
     }
 
 }

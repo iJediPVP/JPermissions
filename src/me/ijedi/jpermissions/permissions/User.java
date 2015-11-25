@@ -95,21 +95,6 @@ public class User {
             config.set("groups", new ArrayList<>());
         }
         saveUser();
-
-        //Remove negative perms from player
-        try{
-            negativeChar = plugin.getConfig().getString("negativeChar").charAt(0);
-        }catch(NullPointerException npe){
-            negativeChar = '^';
-        }
-        for(String world : worldPermList.keySet()){
-            for(String perm : worldPermList.get(world)){
-                if(negativeChar == perm.charAt(0)){
-
-                }
-            }
-        }
-
     }
 
     //Save
