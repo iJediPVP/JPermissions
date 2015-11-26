@@ -7,13 +7,15 @@ Add return buttons to most inventories
 
 package me.ijedi.jpermissions.listeners;
 
-import me.ijedi.jpermissions.inventories.Group.GroupRemovePermInv;
-import me.ijedi.jpermissions.inventories.Group.GroupPermInv;
-import me.ijedi.jpermissions.inventories.Group.GroupListInv;
+import me.ijedi.jpermissions.inventories.Group.GroupRemovePerm;
+import me.ijedi.jpermissions.inventories.Group.GroupPerm;
+import me.ijedi.jpermissions.inventories.Group.GroupList;
 import me.ijedi.jpermissions.inventories.MainInv;
 import me.ijedi.jpermissions.inventories.PlayerListInv;
+import me.ijedi.jpermissions.inventories.Plugins.PluginList;
 import me.ijedi.jpermissions.menulib.MenuManager;
 import me.ijedi.jpermissions.permissions.GroupManager;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -28,7 +30,8 @@ public class InvClick implements Listener {
     //Variables
     private JavaPlugin plugin;
     private MenuManager menuManager = new MenuManager();
-    private String mainName, groupListName, groupPermName, groupRemovePermName, playerListName;
+    private String mainName, groupListName, groupPermName, groupRemovePermName,
+            pluginListName, playerListName;
 
 
 
@@ -40,9 +43,11 @@ public class InvClick implements Listener {
         //Get inv names
         mainName = new MainInv().getName();
 
-        groupListName = new GroupListInv(plugin).getName();
-        groupPermName = new GroupPermInv(plugin, "").getName();
-        groupRemovePermName = new GroupRemovePermInv(plugin, "").getName();
+        groupListName = new GroupList(plugin).getName();
+        groupPermName = new GroupPerm(plugin, "").getName();
+        groupRemovePermName = new GroupRemovePerm(plugin, "").getName();
+
+        playerListName = new PluginList(plugin).getName();
 
         playerListName = new PlayerListInv(plugin).getName();
     }
@@ -71,7 +76,7 @@ public class InvClick implements Listener {
                 //Check item name
                 if(itemName.equals("GROUPS")){
                     //Open group list inventory
-                    player.openInventory(new GroupListInv(plugin).getInventory());
+                    player.openInventory(new GroupList(plugin).getInventory());
 
                 }else if(itemName.equals("PLAYERS")){
                     //Open player list inventory after 2 ticks
@@ -95,64 +100,7 @@ public class InvClick implements Listener {
                 return;
             }
 
-            //GROUP LIST - List current groups
-            if(invName.equals(groupListName)){
 
-                //Check item name
-                GroupManager gm = new GroupManager(plugin);
-                if(gm.hasGroup(itemName)){
-                    player.openInventory(new GroupPermInv(plugin, itemName).getInventory());
-                }
-
-                event.setCancelled(true);
-                return;
-            }
-
-            //GROUP PERM - Edit perms for a group
-            try{
-                if(invName.substring(0, groupPermName.length()).equals(groupPermName)){
-
-                    //Check itemName
-                    if(!itemName.equalsIgnoreCase("EXIT") && !itemName.equalsIgnoreCase("BACK") && !itemName.equalsIgnoreCase("RETURN")){
-                        //Open confirm inv
-                        player.openInventory(new GroupRemovePermInv(plugin, invName.substring(groupPermName.length())).getInventory(itemName));
-
-                    }else if(itemName.equals("RETURN")){
-                        //Return to group list
-                        player.openInventory(new GroupListInv(plugin).getInventory());
-
-                    }else if(itemName.equals("ADD")){
-                        //Show plugin list
-                        player.sendMessage("Add this ");
-                    }
-                    event.setCancelled(true);
-                    return;
-                }
-
-            }catch(NullPointerException npe){} //Do nothing.
-
-            //GROUP REMOVE CONFIRM - Confirmation of permission removal from group
-            if(invName.equals(groupRemovePermName)){
-
-                //Check item
-                if(itemName.equals("CONFIRM")){
-
-                    //Remove perm
-                    String groupName = event.getInventory().getItem(12).getItemMeta().getLore().get(1).substring("Group: ".length());
-                    String perm = event.getInventory().getItem(12).getItemMeta().getLore().get(2).substring("Permission: ".length());
-                    player.performCommand("jp g " + groupName + " p r " + perm);
-
-                    //Return to group perm
-                    player.openInventory(new GroupPermInv(plugin, groupName).getInventory());
-
-                }else if(itemName.equals("CANCEL") || itemName.equals("BACK")){
-                    //Return to group perm
-                    String groupName = event.getInventory().getItem(12).getItemMeta().getLore().get(1).substring("Group: ".length());
-                    player.openInventory(new GroupPermInv(plugin, groupName).getInventory());
-                }
-                event.setCancelled(true);
-                return;
-            }
 
         }
 

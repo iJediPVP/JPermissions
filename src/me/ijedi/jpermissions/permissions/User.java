@@ -215,14 +215,6 @@ public class User {
                     for(String perm : g.getPermissions()){
                         groupAttachment.setPermission(perm, true);
                     }
-                    for(String child : g.getChildren()){
-                        if(groupManager.hasGroup(child)){
-                            Group c = groupManager.getGroup(child);
-                            for(String perm : c.getPermissions()){
-                                groupAttachment.setPermission(perm, true);
-                            }
-                        }
-                    }
                 }
             }
         }

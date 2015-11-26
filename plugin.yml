@@ -10,11 +10,16 @@ commands:
   TEST:
 
 permissions:
-#/jp permissoins
-jp.player:
-  description: Modify player permissions and groups
-jp.group:
-  description: Modify groups
-jp.reload:
-  description: Reload permissions
+  jp.*:
+    description: Access to all JPermissions commands
+    children:
+      jp.player: true
+      jp.group: true
+      jp.reload: true
+  jp.player:
+    description: Modify player permissions and groups
+  jp.group:
+    description: Modify groups
+  jp.reload:
+    description: Reload permissions
 

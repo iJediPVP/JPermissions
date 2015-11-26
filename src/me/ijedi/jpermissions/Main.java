@@ -1,7 +1,9 @@
 package me.ijedi.jpermissions;
 
 import me.ijedi.jpermissions.commands.JPermCommand;
+import me.ijedi.jpermissions.inventories.Group.GroupClickEvent;
 import me.ijedi.jpermissions.inventories.MainInv;
+import me.ijedi.jpermissions.inventories.Plugins.PluginClickEvent;
 import me.ijedi.jpermissions.listeners.InvClick;
 import me.ijedi.jpermissions.listeners.PJoin;
 import me.ijedi.jpermissions.listeners.PQuit;
@@ -11,6 +13,7 @@ import me.ijedi.jpermissions.permissions.GroupManager;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.permissions.Permission;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.ArrayList;
@@ -50,6 +53,8 @@ public class Main extends JavaPlugin {
             new WorldChange(this);
             new MenuListener(this);
             new InvClick(this);
+            new GroupClickEvent(this);
+            new PluginClickEvent(this);
 
             //Log
             getLogger().info("JPermissions enabled");
@@ -82,6 +87,10 @@ public class Main extends JavaPlugin {
         if(cmd.equals("TEST")){
             if(sender instanceof Player){
                 ((Player) sender).openInventory(new MainInv().getInventory());
+            }
+
+            for(Permission perm : this.getDescription().getPermissions()){
+                sender.sendMessage(perm.getName());
             }
         }
 

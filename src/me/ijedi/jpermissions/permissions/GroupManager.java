@@ -60,7 +60,8 @@ public class GroupManager {
         for(String group : groupConfig.getConfigurationSection("").getKeys(false)){
             addGroup(new Group(plugin, group));
         }
-        //If group map is 0 resave the default groups.yml
+
+        //If group map is 0 save the default groups.yml
         if(groupMap.size() == 0){
             plugin.saveResource("groups.yml", true);
             groupFile = new File(plugin.getDataFolder() + "/groups.yml");

@@ -41,8 +41,6 @@ public class JPermCommand implements CommandExecutor{
         add(ChatColor.GREEN + "/jp group <group> remove");
         add(ChatColor.GREEN + "/jp group <group> perm add <permission>");
         add(ChatColor.GREEN + "/jp group <group> perm remove <permission>");
-        add(ChatColor.GREEN + "/jp group <group> child add <group>");
-        add(ChatColor.GREEN + "/jp group <group> child remove <group>");
         add(ChatColor.DARK_RED + "/jp group <group> rank <rank>");
         add(ChatColor.DARK_RED + "/jp group <group> suffix <suffix>");
         add(ChatColor.DARK_RED + "/jp group <group> prefix <prefix>");
@@ -57,7 +55,6 @@ public class JPermCommand implements CommandExecutor{
         }catch(NullPointerException npe){
             colorChar = '&';
         }
-
     }
 
     //Command
@@ -464,83 +461,6 @@ public class JPermCommand implements CommandExecutor{
                 }
                 return;
 
-            //Check for child arg
-            }else if(hasGroupChildArg(args)){
-
-                //Make sure group exists
-                if(groupManager.hasGroup(groupArg)){
-                    Group group = groupManager.getGroup(groupArg);
-
-                    //Check for add/remove arg
-                    if(args.length > 3){
-                        String addRemArg = args[3].toUpperCase();
-
-                        //ADD
-                        if(addRemArg.equals("A") || addRemArg.equals("ADD")){
-                            //Check for child string
-                            if(args.length > 4){
-                                String childString = args[4];
-
-                                //Make sure the child isn't the same group as groupArg
-                                if(groupArg.equalsIgnoreCase(childString)){
-                                    sender.sendMessage(CHATPREFIX + ChatColor.translateAlternateColorCodes('&', String.format("&cYou cannot add the group '&6%s&c' to itself.", childString)));
-                                    return;
-                                }
-
-                                //Check if group has this child
-                                if(!group.hasChild(childString)){
-                                    //Check if child group exists
-                                    if(groupManager.hasGroup(childString)){
-                                        group.addChild(childString);
-                                        group.saveGroup();
-                                       // groupManager.reloadPermissions();
-                                        sender.sendMessage(CHATPREFIX + ChatColor.translateAlternateColorCodes('&', String.format("&aThe child group '&6%s&a' was added to the group '&6%s&a'.", childString, groupArg)));
-
-                                    }else{ //Child group does not exist
-                                        sender.sendMessage(CHATPREFIX + ChatColor.translateAlternateColorCodes('&', String.format("&cThe child group '&6%s&c' does not exist.", childString)));
-                                    }
-
-                                }else{
-                                    sender.sendMessage(CHATPREFIX + ChatColor.translateAlternateColorCodes('&', String.format("&cThe group '&6%s&c' already has the child group '&6%s&c'.", groupArg, childString)));
-                                }
-                                return;
-
-                            }//Else no child arg
-
-                        //REMOVE
-                        }else if(addRemArg.equals("R") || addRemArg.equals("REMOVE")){
-                            //Check for child string
-                            if(args.length > 4){
-                                String childString = args[4];
-                                //Check if group has this child
-                                if(group.hasChild(childString)){
-                                    //Check if child group exists
-                                    if(groupManager.hasGroup(childString)){
-                                        group.removeChild(childString);
-                                        group.saveGroup();
-                                       // groupManager.reloadPermissions();
-                                        sender.sendMessage(CHATPREFIX + ChatColor.translateAlternateColorCodes('&', String.format("&aThe child group '&6%s&a' was removed from the group '&6%s&a'.", childString, groupArg)));
-
-                                    }else{ //Child group does not exist
-                                        sender.sendMessage(CHATPREFIX + ChatColor.translateAlternateColorCodes('&', String.format("&cThe child group '&6%s&c' does not exist.", childString)));
-                                    }
-
-                                }else{
-                                    sender.sendMessage(CHATPREFIX + ChatColor.translateAlternateColorCodes('&', String.format("&cThe group '&6%s&c' does not have the child group '&6%s&c'.", groupArg, childString)));
-                                }
-                                return;
-
-                            }//Else no child arg
-                        }
-
-                    }//Else show help
-                    showGroupHelp(sender);
-
-                }else{
-                    sender.sendMessage(CHATPREFIX + ChatColor.RED + "This group does not exist.");
-                }
-                return;
-
             //Check for prefix/suffix/rank args
             }else{
                 if(args.length > 2){
@@ -655,15 +575,6 @@ public class JPermCommand implements CommandExecutor{
             //Check for remove arg
             String removeArg = args[3].toUpperCase();
             if(removeArg.equals("R") || removeArg.equals("REMOVE")){
-                return true;
-            }
-        }
-        return false;
-    }
-    public boolean hasGroupChildArg(String[] args){
-        if(args.length > 2){
-            String childArg = args[2].toUpperCase();
-            if(childArg.equals("CH") || childArg.equals("CHILD")){
                 return true;
             }
         }

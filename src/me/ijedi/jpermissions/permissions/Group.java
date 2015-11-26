@@ -17,7 +17,6 @@ public class Group {
     private GroupManager groupManager;
     private String name;
     private List<String> permList = new ArrayList<>();
-    private List<String> childList = new ArrayList<>();
     private String prefix = "";
     private String suffix = "";
     private int rank = 0;
@@ -33,7 +32,7 @@ public class Group {
         }
         config = YamlConfiguration.loadConfiguration(file);
 
-        //Try to get permissions and child groups
+        //Try to get permissions
         try{
             for(String perm : config.getStringList(name + ".permissions")){
                 perm = perm.toLowerCase();
@@ -41,14 +40,6 @@ public class Group {
             }
         }catch(NullPointerException npe){ //permissions key doesn't exist
             config.set(name + ".permissions", new ArrayList<>());
-        }
-        try{
-            childList = config.getStringList(name + ".children");
-            for(String child : config.getStringList(name + ".children")){
-                childList.add(child.toLowerCase());
-            }
-        }catch(NullPointerException npe){ //Children key does not exist
-            config.set(name + ".children", new ArrayList<>());
         }
 
         //Try and get prefix & suffix
@@ -93,7 +84,6 @@ public class Group {
         file = new File(plugin.getDataFolder() + "/groups.yml");
         config = YamlConfiguration.loadConfiguration(file);
         config.set(name + ".permissions", permList);
-        config.set(name + ".children", childList);
         config.set(name + ".prefix", prefix);
         config.set(name + ".suffix", suffix);
         config.set(name + ".rank", rank);
@@ -149,29 +139,6 @@ public class Group {
     }
     public List<String> getPermissions(){
         return permList;
-    }
-
-    //Children
-    public boolean hasChild(String childName){
-        childName = childName.toLowerCase();
-        return childList.contains(childName);
-    }
-    public void addChild(String childName){
-        childName = childName.toLowerCase();
-        if(!hasChild(childName)){
-            childList.add(childName);
-            saveGroup();
-        }
-    }
-    public void removeChild(String childName){
-        childName = childName.toLowerCase();
-        if(hasChild(childName)){
-            childList.remove(childName);
-            saveGroup();
-        }
-    }
-    public List<String> getChildren(){
-        return childList;
     }
 
 }
