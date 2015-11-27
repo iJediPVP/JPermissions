@@ -1,6 +1,7 @@
-package me.ijedi.jpermissions.inventories;
+package me.ijedi.jpermissions.inventories.Other;
 
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.Inventory;
@@ -19,10 +20,21 @@ public class MainInv {
     //Constructor
     public MainInv(){
         //Add items
-        inventory.setItem(12, createItem(Material.BOOK, (short) 0, "Groups", Collections.singletonList("Edit groups"), false));
-        inventory.setItem(14, createItem(Material.SKULL_ITEM, (short) 3, "Players", Collections.singletonList("Edit players"), false));
-        inventory.setItem(22, createItem(Material.ARROW, (short) 0, "Exit", Collections.singletonList("Exit"), false));
-        inventory.setItem(26, createItem(Material.NETHER_STAR, (short) 0, "Reload", Collections.singletonList("Reload perms"), false));
+        inventory.setItem(12, createItem(Material.BOOK, (short) 0,
+                ChatColor.GREEN + "" + ChatColor.BOLD + "Groups",
+                Collections.singletonList(ChatColor.GOLD + "" + ChatColor.ITALIC + "Edit groups"), false));
+
+        inventory.setItem(14, createItem(Material.SKULL_ITEM, (short) 3,
+                ChatColor.AQUA + "" + ChatColor.BOLD + "Players",
+                Collections.singletonList(ChatColor.GOLD + "" + ChatColor.ITALIC + "Edit players"), false));
+
+        inventory.setItem(22, createItem(Material.ARROW, (short) 0,
+                ChatColor.RED + "" + ChatColor.BOLD + "Exit",
+                Collections.singletonList(ChatColor.GOLD + "" + ChatColor.ITALIC + "Exit"), false));
+
+        inventory.setItem(26, createItem(Material.NETHER_STAR, (short) 0,
+                ChatColor.GOLD + "" + ChatColor.BOLD + "Reload",
+                Collections.singletonList(ChatColor.GOLD + "" + ChatColor.ITALIC + "Reload permissions"), false));
     }
 
     //Create item

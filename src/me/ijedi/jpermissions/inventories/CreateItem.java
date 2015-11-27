@@ -2,6 +2,7 @@ package me.ijedi.jpermissions.inventories;
 
 import me.ijedi.jpermissions.menulib.Menu;
 import me.ijedi.jpermissions.menulib.MenuManager;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.Inventory;
@@ -30,16 +31,26 @@ public class CreateItem {
 
     //Set items
     public void setButtons(Menu menu){
-        ItemStack exit = makeItem(Material.BARRIER, (short) 0, "Exit", Collections.singletonList("Exit"), false);
-        ItemStack back = makeItem(Material.ARROW, (short) 0, "Back", Collections.singletonList("Back"), false);
-        ItemStack next = makeItem(Material.ARROW, (short) 0, "Next", Collections.singletonList("Next"), false);
+        ItemStack exit = makeItem(Material.BARRIER, (short) 0,
+                ChatColor.RED + "" + ChatColor.BOLD + "Exit",
+                Collections.singletonList(ChatColor.GOLD + "" + ChatColor.ITALIC + "Exit Menu"), false);
+
+        ItemStack back = makeItem(Material.ARROW, (short) 0,
+                ChatColor.RED + "" + ChatColor.BOLD + "Back",
+                Collections.singletonList(ChatColor.GOLD + "" + ChatColor.ITALIC + "Previous Page"), false);
+
+        ItemStack next = makeItem(Material.ARROW, (short) 0,
+                ChatColor.GREEN + "" + ChatColor.BOLD + "Next",
+                Collections.singletonList(ChatColor.GOLD + "" + ChatColor.ITALIC + "Next Page"), false);
 
         menu.setButtons(exit, back, next);
     }
 
     //Add return button
     public void addReturn(Menu menu){
-        ItemStack returnItem = makeItem(Material.ARROW, (short) 0, "Return", Collections.singletonList("Return"), false);
+        ItemStack returnItem = makeItem(Material.ARROW, (short) 0,
+                ChatColor.RED + "" + ChatColor.BOLD + "Return",
+                Collections.singletonList(ChatColor.GOLD + "" + ChatColor.ITALIC + "Return to the previous menu"), false);
         for(Inventory inventory : new MenuManager().getMenuPageList(menu.getName())){
             inventory.setItem(inventory.getSize() - 9, returnItem);
         }

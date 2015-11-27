@@ -223,6 +223,14 @@ public class User {
             player.sendMessage(perm);
         }
     }
+    public List<String> getPermissions(String worldName) throws NullPointerException{
+        worldName = worldName.toLowerCase();
+        if(worldPermList.containsKey(worldName)){
+            return worldPermList.get(worldName);
+        }else{
+            throw new NullPointerException("Player does not have any permissions in this world.");
+        }
+    }
 
     //Groups
     public boolean hasGroup(String worldName, String group){
