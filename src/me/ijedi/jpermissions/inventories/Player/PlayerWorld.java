@@ -21,7 +21,7 @@ public class PlayerWorld {
 
     //Variablse
     private JavaPlugin plugin;
-    private String name = "World List: ";
+    private String name = "World List";
 
     //Constructor
     public PlayerWorld(JavaPlugin plugin){
@@ -29,8 +29,7 @@ public class PlayerWorld {
     }
 
     //Get inventory
-    public Inventory getInventory(String playerName){
-        name = name + playerName;
+    public Inventory getInventory(String playerName){;
         Menu menu = new Menu(name);
         CreateItem ci = new CreateItem();
 
@@ -48,10 +47,13 @@ public class PlayerWorld {
                     name = ChatColor.RED + "" + ChatColor.BOLD + name;
                 }else if(world.getEnvironment().equals(World.Environment.THE_END)){
                     mat = Material.ENDER_STONE;
-                    name = ChatColor.YELLOW + "" + ChatColor.BOLD +  name;
+                    name = ChatColor.YELLOW + "" + ChatColor.BOLD + name;
                 }
 
-                worldItems.add(ci.makeItem(mat, (short) 0, name, Collections.singletonList(ChatColor.GOLD + "" + ChatColor.ITALIC + "Edit player permissions in this world.."), false));
+                worldItems.add(ci.makeItem(mat, (short) 0, name, Arrays.asList(
+                                ChatColor.GOLD + "" + ChatColor.ITALIC + "Edit player permissions in this world..",
+                                ChatColor.GOLD + "" + ChatColor.ITALIC + "Player: " + ChatColor.GREEN + "" + ChatColor.ITALIC + playerName),
+                        false));
             }
             menu.setContents(worldItems.toArray(new ItemStack[worldItems.size()]));
 

@@ -11,6 +11,7 @@ import me.ijedi.jpermissions.listeners.PQuit;
 import me.ijedi.jpermissions.listeners.WorldChange;
 import me.ijedi.jpermissions.menulib.MenuListener;
 import me.ijedi.jpermissions.permissions.GroupManager;
+import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;

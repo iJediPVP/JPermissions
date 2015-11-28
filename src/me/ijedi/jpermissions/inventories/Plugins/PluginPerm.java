@@ -3,13 +3,11 @@ package me.ijedi.jpermissions.inventories.Plugins;
 import me.ijedi.jpermissions.inventories.CreateItem;
 import me.ijedi.jpermissions.menulib.Menu;
 import me.ijedi.jpermissions.menulib.MenuManager;
-import me.ijedi.jpermissions.permissions.Group;
 import me.ijedi.jpermissions.permissions.GroupManager;
 import me.ijedi.jpermissions.permissions.User;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
-import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -18,10 +16,8 @@ import org.bukkit.permissions.Permission;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 public class PluginPerm {
@@ -57,11 +53,17 @@ public class PluginPerm {
         lore.add(ChatColor.GOLD + "" + ChatColor.ITALIC + "Plugin: " + ChatColor.GREEN + "" + ChatColor.ITALIC + pluginName);
 
         String objectName = ChatColor.stripColor(lore.get(1).split(": ")[1]);
+        String worldName =  "";
+        if(lore.size() >= 3){
+            try{
+                worldName = ChatColor.stripColor(lore.get(2).split(": ")[1]);
+            }catch(ArrayIndexOutOfBoundsException e){}
+        }
 
         List<ItemStack> permItems = new ArrayList<>();
         for(Permission perm : plugin.getDescription().getPermissions()){
 
-            if(hasPerm(objectName, perm.getName())){
+            if(hasPerm(objectName, perm.getName(), worldName)){
                 lore.set(0, ChatColor.GOLD + "" + ChatColor.ITALIC + "Already has this permission..");
                 permItems.add(ci.makeItem(Material.INK_SACK, (short) 10, ChatColor.GREEN + "" + ChatColor.BOLD + perm.getName(), lore, false));
             }else{
@@ -75,31 +77,28 @@ public class PluginPerm {
         //Add buttons
         ci.setButtons(menu);
 
+        //Custom return button
         ItemStack returnItem = new ItemStack(Material.ARROW);
-        ItemMeta itemMeta = returnItem.getItemMeta();
-        itemMeta.setDisplayName(ChatColor.RED + "" + ChatColor.BOLD + "Return");
+        ItemMeta meta = returnItem.getItemMeta();
+        meta.setDisplayName(ChatColor.RED + "" + ChatColor.BOLD + "Return");
         lore.set(0, ChatColor.GOLD + "" + ChatColor.ITALIC + "Return to the previous menu");
-        lore.remove(lore.size() - 1); //Remove plugin name
-        lore.remove(lore.size() - 1); //Remove blank space
-        itemMeta.setLore(lore);
-        returnItem.setItemMeta(itemMeta);
+        lore.remove(lore.size() - 1);
+        lore.remove(lore.size() - 1);
+        meta.setLore(lore);
+        returnItem.setItemMeta(meta);
         ci.addReturn(menu, returnItem);
-
 
         return menuManager.getMenu(invName);
     }
 
     //Is player
-    private boolean hasPerm(String objectName, String permission){
+    private boolean hasPerm(String objectName, String permission, String worldName){
         //Check for player
         for(Player player : Bukkit.getOnlinePlayers()){
             if(player.getName().equalsIgnoreCase(objectName)){
                 User user = groupManager.getUser(player.getUniqueId());
-                for(World world : Bukkit.getWorlds()){
-                    if(user.hasPermission(world.getName(), permission)){
-                        Bukkit.broadcastMessage("true");
-                        return true;
-                    }
+                if(user.hasPermission(worldName, permission)){
+                    return true;
                 }
                 return false;
             }
@@ -109,7 +108,6 @@ public class PluginPerm {
         if(groupManager.getGroup(objectName).hasPermission(permission)){
             return true;
         }
-        Bukkit.broadcastMessage("OI");
         return false;
 
     }

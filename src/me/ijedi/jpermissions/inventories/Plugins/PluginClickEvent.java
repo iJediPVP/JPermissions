@@ -3,6 +3,7 @@ package me.ijedi.jpermissions.inventories.Plugins;
 import me.ijedi.jpermissions.inventories.Other.AddPerm;
 import me.ijedi.jpermissions.inventories.Group.GroupPerm;
 import me.ijedi.jpermissions.inventories.Player.PlayerPerm;
+import me.ijedi.jpermissions.permissions.GroupManager;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
@@ -53,34 +54,35 @@ public class PluginClickEvent implements Listener {
             Player player = (Player) event.getWhoClicked();
 
             //PLUGIN LIST
-            try{
-                if(invName.substring(0, pluginList.length()).equals(pluginList)){
-                    List<String> lore = event.getCurrentItem().getItemMeta().getLore();
+            if(invName.equals(pluginList)){
+                //Get object info from slot 10. The list will have this plugin at minimum
+                List<String> lore = event.getInventory().getItem(10).getItemMeta().getLore();
+                String[] args = lore.get(1).split(": ");
+                String objectType = ChatColor.stripColor(args[0]);
+                String objectName = ChatColor.stripColor(args[1]);
 
-                    //Check itemName
-                    if(itemName.equalsIgnoreCase("RETURN")){
-                        //Go back to object's perm list (GroupPerm or PlayerPerm)
-                        String[] args = lore.get(1).split(": ");
+                //Check itemName
+                if(itemName.equalsIgnoreCase("RETURN")){
 
-                        //Player
-                        if(ChatColor.stripColor(args[0]).equalsIgnoreCase("Player")){
-                            String playerName = ChatColor.stripColor(args[1]);
-                            String worldName = ChatColor.stripColor(lore.get(2).split(" ")[1]);
-                            player.openInventory(new PlayerPerm(plugin).getInventory(playerName, worldName));
+                    //Check if Player or group
+                    if(objectType.equalsIgnoreCase("PLAYER")){
+                        //Back to PlayerPerm
+                        String worldName = ChatColor.stripColor(lore.get(lore.size() - 1).split(": ")[1]);
+                        player.openInventory(new PlayerPerm(plugin).getInventory(worldName, lore));
 
-                        }else{ //Group
-                            player.openInventory(new GroupPerm(plugin).getInventory(ChatColor.stripColor(args[1])));
-                        }
-
-                    }else if(!blackList.contains(itemName.toUpperCase())){
-                        //Open PluginPerm
-                        player.openInventory(new PluginPerm(plugin).getInventory(itemName, lore));
+                    }else if(objectType.equalsIgnoreCase("GROUP")){
+                        //Back to GroupPerm
+                        player.openInventory(new GroupPerm(plugin).getInventory(objectName));
                     }
 
-                    event.setCancelled(true);
-                    return;
+                }else if(!blackList.contains(itemName.toUpperCase())){
+                    //Open PluginPerm
+                    player.openInventory(new PluginPerm(plugin).getInventory(itemName, event.getCurrentItem().getItemMeta().getLore()));
                 }
-            }catch(NullPointerException | StringIndexOutOfBoundsException e){} //Do nothing
+
+                event.setCancelled(true);
+                return;
+            }
 
             //PLUGIN PERM
             try{
@@ -89,14 +91,13 @@ public class PluginClickEvent implements Listener {
 
                     //Check itemName
                     if(itemName.equalsIgnoreCase("RETURN")){
-                        //Go back to PermList
-                        String objectName = ChatColor.stripColor(lore.get(1).split(": ")[1]);
-                        player.openInventory(new PluginList(plugin).getInventory(objectName, lore));
+                        //Back to PluginList
+                        player.openInventory(new PluginList(plugin).getInventory(lore));
 
                     }else if(!blackList.contains(itemName.toUpperCase())){
-                        //Open AddPerm
-                        lore.add(ChatColor.GOLD + "" + ChatColor.ITALIC + "Permission: " + ChatColor.GREEN + "" + ChatColor.ITALIC + itemName);
+                        //Add perm...
                         player.openInventory(new AddPerm().getInventory(lore));
+
                     }
 
                     event.setCancelled(true);
@@ -105,25 +106,9 @@ public class PluginClickEvent implements Listener {
             }catch(NullPointerException | StringIndexOutOfBoundsException e){} //Do nothing
 
 
-
-
-
-
         }catch(NullPointerException npe){} //No inv name
 
     }
 
-    private boolean isPlayer(String name){
-        for(Player player : Bukkit.getOnlinePlayers()){
-            if(player.getName().equalsIgnoreCase(name)){
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private void doReturn(Player whoClicked, List<String> lore){
-
-    }
-
 }
+

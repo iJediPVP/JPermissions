@@ -13,14 +13,12 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class GroupClickEvent implements Listener {
 
     //Variables
     private JavaPlugin plugin;
-    private final String CHATPREFIX = ChatColor.AQUA + "" + ChatColor.BOLD + "[JPerms] ";
     private String groupList, groupPerm;
     private List<String> blackList = new ArrayList<String>(){{
         add("EXIT");
@@ -61,7 +59,7 @@ public class GroupClickEvent implements Listener {
 
                 //Check itemName
                 if(itemName.equalsIgnoreCase("RETURN")){
-                    //Go back to MainInv
+                    //Back to MainInv
                     player.openInventory(new MainInv().getInventory());
 
                 }else if(!blackList.contains(itemName.toUpperCase())){
@@ -76,25 +74,19 @@ public class GroupClickEvent implements Listener {
             //GROUP PERM
             try{
                 if(invName.substring(0, groupPerm.length()).equals(groupPerm)){
-                    String groupName = invName.substring(groupPerm.length());
 
                     //Check itemName
                     if(itemName.equalsIgnoreCase("RETURN")){
-                        //Go back to GroupList
+                        //Back to GroupList
                         player.openInventory(new GroupList(plugin).getInventory());
 
                     }else if(itemName.equalsIgnoreCase("ADD")){
                         //Open PluginList
-                        player.openInventory(new PluginList(plugin).getInventory(groupName, Arrays.asList(
-                                ChatColor.GOLD + "" + ChatColor.ITALIC + "Add permission from this plugin to...",
-                                ChatColor.GOLD + "" + ChatColor.ITALIC + "Group: " + ChatColor.GREEN + "" + ChatColor.ITALIC + groupName)));
+                        player.openInventory(new PluginList(plugin).getInventory(event.getCurrentItem().getItemMeta().getLore()));
 
                     }else if(!blackList.contains(itemName.toUpperCase())){
                         //Open RemovePerm
-                        List<String> lore = event.getCurrentItem().getItemMeta().getLore();
-                        lore.add(ChatColor.GOLD + "" + ChatColor.ITALIC + "Permission: " + ChatColor.GREEN + "" + ChatColor.ITALIC + itemName);
-                        player.openInventory(new RemovePerm().getInventory(lore));
-
+                        player.openInventory(new RemovePerm().getInventory(itemName, event.getCurrentItem().getItemMeta().getLore()));
                     }
 
                     event.setCancelled(true);

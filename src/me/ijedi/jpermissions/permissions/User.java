@@ -218,10 +218,6 @@ public class User {
                 }
             }
         }
-
-        for(String perm : permAttachment.getPermissions().keySet()){
-            player.sendMessage(perm);
-        }
     }
     public List<String> getPermissions(String worldName) throws NullPointerException{
         worldName = worldName.toLowerCase();

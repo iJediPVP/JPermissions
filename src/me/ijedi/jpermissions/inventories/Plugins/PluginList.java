@@ -24,7 +24,7 @@ public class PluginList {
     private JavaPlugin plugin;
     private Menu menu;
     private MenuManager menuManager = new MenuManager();
-    private String name = "Plugin List: ";
+    private String name = "Plugin List";
 
     //Constructor
     public PluginList(JavaPlugin plugin){
@@ -32,8 +32,7 @@ public class PluginList {
     }
 
     //Get inventory
-    public Inventory getInventory(String objectName, List<String> lore){
-        name = name + objectName;
+    public Inventory getInventory(List<String> lore){
         menu = new Menu(name);
         CreateItem ci = new CreateItem();
 
@@ -48,26 +47,9 @@ public class PluginList {
 
         //Set buttons
         ci.setButtons(menu);
-
-        ItemStack returnItem = new ItemStack(Material.ARROW);
-        ItemMeta meta = returnItem.getItemMeta();
-        meta.setDisplayName(ChatColor.RED + "" + ChatColor.BOLD + "Return");
-        lore.set(0, ChatColor.GREEN + "" + ChatColor.ITALIC + "Return to the previous menu..");
-        meta.setLore(lore);
-        returnItem.setItemMeta(meta);
-        ci.addReturn(menu, returnItem);
+        ci.addReturn(menu);
 
         return menuManager.getMenu(name);
-    }
-
-    //Check if player
-    private boolean isPlayer(String name){
-        for(Player player : Bukkit.getOnlinePlayers()){
-            if(player.getName().equalsIgnoreCase(name)){
-                return true;
-            }
-        }
-        return false;
     }
 
     //Get name

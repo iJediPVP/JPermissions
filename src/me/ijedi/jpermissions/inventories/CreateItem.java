@@ -46,6 +46,13 @@ public class CreateItem {
         menu.setButtons(exit, back, next);
     }
 
+    //Add add buttons
+    public void addAdd(Menu menu, ItemStack item){
+        for(Inventory inventory : new MenuManager().getMenuPageList(menu.getName())){
+            inventory.setItem(inventory.getSize() - 1, item);
+        }
+    }
+
     //Add return button
     public void addReturn(Menu menu){
         ItemStack returnItem = makeItem(Material.ARROW, (short) 0,

@@ -21,7 +21,7 @@ public class PlayerPerm {
 
     //Variables
     private JavaPlugin plugin;
-    private String name = "Permissions: ";
+    private String name = "Player Permissions";
 
 
     //Constructor
@@ -30,14 +30,21 @@ public class PlayerPerm {
     }
 
     //Get inventory
-    public Inventory getInventory(String playerName, String worldName){
+    public Inventory getInventory(final String worldName, List<String> itemLore){
+
+        final String playerName = ChatColor.stripColor(itemLore.get(1).split(": ")[1]);
+
+        List<String> newLore = new ArrayList<String>(){{
+            add(ChatColor.GOLD + "" + ChatColor.ITALIC + "Edit player permissions in this world..");
+            add(ChatColor.GOLD + "" + ChatColor.ITALIC + "Player: " + ChatColor.GREEN + "" + ChatColor.ITALIC + playerName);
+            add(ChatColor.GOLD + "" + ChatColor.ITALIC + "World: " + ChatColor.GREEN + "" + ChatColor.ITALIC + worldName);
+        }};
 
         //Make sure player is online
         Player player = Bukkit.getPlayer(playerName);
         if(player != null){
 
             //Create menu
-            name = name + player.getName();
             Menu menu = new Menu(name);
             MenuManager menuManager = new MenuManager();
             CreateItem ci = new CreateItem();
@@ -56,13 +63,8 @@ public class PlayerPerm {
             try{
                 List<ItemStack> itemList = new ArrayList<>();
                 for(String perm : user.getPermissions(worldName)){
-                    itemList.add(ci.makeItem(Material.PAPER, (short) 0,
-                            ChatColor.GREEN + "" + ChatColor.BOLD + perm,
-                            Arrays.asList(
-                                    ChatColor.GOLD + "" + ChatColor.ITALIC + "Click to remove this permission..",
-                                    ChatColor.GOLD + "" + ChatColor.ITALIC + "Player: " + ChatColor.GREEN + "" + ChatColor.ITALIC + player.getName(),
-                                    ChatColor.GOLD + "" + ChatColor.ITALIC + "World: " + ChatColor.GREEN + "" + ChatColor.ITALIC + worldName),
-                            false));
+                    itemList.add(ci.makeItem(Material.INK_SACK, (short) 10,
+                            ChatColor.GREEN + "" + ChatColor.BOLD + perm, newLore, false));
                 }
                 menu.setContents(itemList.toArray(new ItemStack[itemList.size()]));
 
@@ -73,18 +75,15 @@ public class PlayerPerm {
 
             //Set buttons
             ci.setButtons(menu);
-            ci.addReturn(menu);
 
-            ItemStack add = ci.makeItem(Material.INK_SACK, (short) 10,
-                    ChatColor.GREEN + "" + ChatColor.BOLD + "Add",
-                    Arrays.asList(
-                            ChatColor.GOLD + "" + ChatColor.ITALIC + "Add permissions..",
-                            ChatColor.GOLD + "" + ChatColor.ITALIC + "Player: " + ChatColor.GREEN + "" + ChatColor.ITALIC + player.getName(),
-                            ChatColor.GOLD + "" + ChatColor.ITALIC + "World: " + ChatColor.GREEN + "" + ChatColor.ITALIC + worldName),
-                    false);
-            for(Inventory inventory : menuManager.getMenuPageList(name)){
-                inventory.setItem(inventory.getSize() - 1, add);
-            }
+            //Custom add and return buttons
+            newLore.set(0, ChatColor.GOLD + "" + ChatColor.ITALIC + "Return to the previous menu");
+            ItemStack returnItem = ci.makeItem(Material.ARROW, (short) 0, ChatColor.RED + "" + ChatColor.BOLD + "Return", newLore, false);
+            ci.addReturn(menu, returnItem);
+
+            newLore.set(0, ChatColor.GOLD + "" + ChatColor.ITALIC + "Add player permissions..");
+            ItemStack add = ci.makeItem(Material.INK_SACK, (short) 10, ChatColor.GREEN + "" + ChatColor.BOLD + "Add", newLore, false);
+            ci.addAdd(menu, add);
 
             return menuManager.getMenu(name);
         }

@@ -70,64 +70,46 @@ public class PlayerClickEvent implements Listener {
             }
 
             //PLAYER WORLD
-            try{
-                if(invName.substring(0, playerWorld.length()).equals(playerWorld)){
+            if(invName.equals(playerWorld)){
 
-                    //Check itemName
-                    if(itemName.equalsIgnoreCase("RETURN")){
-                        //Go back to PlayerList
-                        player.openInventory(new PlayerList(plugin).getInventory());
+                //Check itemName
+                if(itemName.equalsIgnoreCase("RETURN")){
+                    //Go back to PlayerList
+                    player.openInventory(new PlayerList(plugin).getInventory());
 
-                    }else if(!blackList.contains(itemName.toUpperCase())){
-                        //Open PlayerPerm
-                        String playerName = invName.substring(playerWorld.length());
-                        player.openInventory(new PlayerPerm(plugin).getInventory(playerName, itemName));
-                    }
-
-                    event.setCancelled(true);
-                    return;
+                }else if(!blackList.contains(itemName.toUpperCase())){
+                    //Open PlayerPerm
+                    player.openInventory(new PlayerPerm(plugin).getInventory(itemName, event.getCurrentItem().getItemMeta().getLore()));
                 }
-            }catch(NullPointerException | StringIndexOutOfBoundsException e){} //Do nothing
+
+                event.setCancelled(true);
+                return;
+            }
 
             //PLAYER PERM
-            try{
-                if(invName.substring(0, playerPerm.length()).equals(playerPerm)){
-                    String playerName = invName.substring(playerPerm.length());
-                    List<String> lore = event.getCurrentItem().getItemMeta().getLore();
+            if(invName.equals(playerPerm)){
+                //Get player name and world off Return button
+                List<String> lore = event.getInventory().getItem(event.getInventory().getSize() - 9).getItemMeta().getLore();
+                String playerName = ChatColor.stripColor(lore.get(lore.size() - 2).split(": ")[1]);
+                String worldname = ChatColor.stripColor(lore.get(lore.size() - 1).split(": ")[1]);
 
-                    //Check itemName
-                    if(itemName.equalsIgnoreCase("RETURN")){
-                        //Go back to PlayerWorld
-                        player.openInventory(new PlayerWorld(plugin).getInventory(playerName));
+                //Check itemName
+                if(itemName.equalsIgnoreCase("RETURN")){
+                    //Go back to PlayerWorld
+                    player.openInventory(new PlayerWorld(plugin).getInventory(playerName));
 
-                    }else if(itemName.equalsIgnoreCase("ADD")){
-                        //Open PluginList
-                        player.openInventory(new PluginList(plugin).getInventory(playerName, lore));
+                }else if(itemName.equalsIgnoreCase("ADD")){
+                    //Open PluginList
+                    player.openInventory(new PluginList(plugin).getInventory(lore));
 
-                    }else if(!blackList.contains(itemName.toUpperCase())){
-                        //Check if player has this perm
-                        Player pObject = Bukkit.getPlayer(playerName);
-                        if(pObject != null){
-                            if(pObject.hasPermission(itemName)){
-                                //Open RemovePerm
-                                lore.add(ChatColor.GOLD + "" + ChatColor.ITALIC + "Permission: " + ChatColor.GREEN + "" + ChatColor.ITALIC + itemName);
-                                player.openInventory(new RemovePerm().getInventory(lore));
-
-                            }else{ //Player no longer has this perm. Refresh inventory
-                                player.sendMessage("This player does not have this permission..");
-                                player.openInventory(new PlayerPerm(plugin).getInventory(playerName, ChatColor.stripColor(lore.get(lore.size() - 1).substring("World: ".length()))));
-                            }
-
-                        }else{
-                            player.sendMessage("This player is not online..");
-                        }
-
-                    }
-
-                    event.setCancelled(true);
-                    return;
+                }else if(!blackList.contains(itemName.toUpperCase())){
+                    //Remove permission
+                    player.openInventory(new RemovePerm().getInventory(itemName, lore));
                 }
-            }catch(NullPointerException | StringIndexOutOfBoundsException e){} //Do nothing
+
+                event.setCancelled(true);
+                return;
+            }
 
 
         }catch(NullPointerException npe){} //Do nothing..

@@ -32,10 +32,7 @@ public class GroupPerm {
     //Get inventory
     public Inventory getInventory(String groupName){
 
-        //Try to remove extra color crap
-        try{
-            groupName = groupName.split(" ")[1];
-        }catch(ArrayIndexOutOfBoundsException e){} //Do nothing;
+        groupName = ChatColor.stripColor(groupName);
 
         //Create menu
         invName = invName + groupName;
@@ -65,7 +62,7 @@ public class GroupPerm {
         //Create and set return & add buttons for all menu pages
         ci.addReturn(menu);
         ItemStack add = ci.makeItem(Material.INK_SACK, (short) 1,
-                "Add",
+                ChatColor.GREEN + "" + ChatColor.BOLD + "Add",
                 Arrays.asList(
                         ChatColor.GOLD + "" + ChatColor.ITALIC + "Add permissions",
                         ChatColor.GOLD + "" + ChatColor.ITALIC + "Group: " + ChatColor.GREEN + "" + ChatColor.ITALIC + groupName),

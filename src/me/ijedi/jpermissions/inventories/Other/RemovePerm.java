@@ -6,6 +6,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.inventory.Inventory;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class RemovePerm {
@@ -14,18 +15,18 @@ public class RemovePerm {
     private String name = "Remove Permission";
 
     //Get inventory
-    public Inventory getInventory(List<String> lore){
-        Inventory inventory = Bukkit.createInventory(null, 36, name);
+    public Inventory getInventory(String permission, List<String> lore){
+        Inventory inventory = Bukkit.createInventory(null, 27, name);
         CreateItem ci = new CreateItem();
 
         //Set items
-        lore.set(0, ChatColor.GREEN + "" + org.bukkit.ChatColor.ITALIC + "Remove this permission from..");
-        lore.add(lore.size() - 1, "");
+        lore.set(0, ChatColor.GOLD + "" + org.bukkit.ChatColor.ITALIC + "Remove this permission from..");
+        lore.add(ChatColor.GOLD + "" + org.bukkit.ChatColor.ITALIC + "Permission: " + ChatColor.GREEN + "" + org.bukkit.ChatColor.ITALIC + permission);
+
 
         inventory.setItem(12, ci.makeItem(Material.WOOL, (short) 13, ChatColor.GREEN + "" + ChatColor.BOLD + "Confirm", lore, false));
         inventory.setItem(14, ci.makeItem(Material.WOOL, (short) 14, ChatColor.RED + "" + ChatColor.BOLD + "Cancel", lore, false));
-        lore.remove(lore.size() - 1); //Remove perm
-        lore.remove(lore.size() - 1); //Remove blank
+        lore.clear();
         inventory.setItem(22, ci.makeItem(Material.ARROW, (short) 0, ChatColor.RED + "" + ChatColor.BOLD + "Back", lore, false));
 
         return inventory;

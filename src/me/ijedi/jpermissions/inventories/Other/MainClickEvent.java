@@ -1,20 +1,11 @@
-/*
-Add perm to group
-Remove perm from player
-Add perm to player
-Add return buttons to most inventories
-* */
 
 package me.ijedi.jpermissions.inventories.Other;
 
-import me.ijedi.jpermissions.inventories.Other.AddPerm;
 import me.ijedi.jpermissions.inventories.Group.GroupList;
 import me.ijedi.jpermissions.inventories.Group.GroupPerm;
-import me.ijedi.jpermissions.inventories.Other.MainInv;
 import me.ijedi.jpermissions.inventories.Player.PlayerList;
 import me.ijedi.jpermissions.inventories.Player.PlayerPerm;
 import me.ijedi.jpermissions.inventories.Plugins.PluginPerm;
-import me.ijedi.jpermissions.inventories.Other.RemovePerm;
 import me.ijedi.jpermissions.menulib.MenuManager;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -22,10 +13,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.List;
 
@@ -59,7 +48,7 @@ public class MainClickEvent implements Listener {
             //Try and get item name
             String itemName;
             try{
-                itemName = ChatColor.stripColor(event.getCurrentItem().getItemMeta().getDisplayName()).toUpperCase();
+                itemName = ChatColor.stripColor(event.getCurrentItem().getItemMeta().getDisplayName());
             }catch(NullPointerException npe){
                 return;
             }
@@ -70,46 +59,37 @@ public class MainClickEvent implements Listener {
             //MAIN - Options to reload, edit groups, or edit players.
             if(invName.equals(mainName)){
 
-                //Check item name
-                if(itemName.equals("GROUPS")){
-                    //Check for perms
+                //Check itemName
+                if(itemName.equalsIgnoreCase("GROUPS")){
+                    //Check perms
                     if(player.hasPermission("jp.group")){
-                        //Open group list inventory
+                        //Open GroupList
                         player.openInventory(new GroupList(plugin).getInventory());
-
                     }else{
                         player.sendMessage(ChatColor.RED + "You do not have permission to use this.");
                     }
 
-                }else if(itemName.equals("PLAYERS")){
-                    //Check for perms
+                }else if(itemName.equalsIgnoreCase("PLAYERS")){
+                    //Check perms
                     if(player.hasPermission("jp.player")){
-                        //Open player list inventory after 2 ticks
-                        final Inventory inventory = new PlayerList(plugin).getInventory();
-                        new BukkitRunnable(){
-                            @Override
-                            public void run() {
-                                player.openInventory(inventory);
-                            }
-                        }.runTaskLater(plugin, 2l);
-
+                        //Open PlayerList
+                        player.openInventory(new PlayerList(plugin).getInventory());
                     }else{
                         player.sendMessage(ChatColor.RED + "You do not have permission to use this.");
                     }
 
-                }else if(itemName.equals("EXIT")){
-                    //Close inventory
-                    player.closeInventory();
-
-                }else if(itemName.equals("RELOAD")){
-                    //Check for perms
+                }else if(itemName.equalsIgnoreCase("RELOAD")){
+                    //Check perms
                     if(player.hasPermission("jp.reload")){
                         //Reload perms
                         player.performCommand("jp reload");
-
                     }else{
-                        player.setPlayerListName(ChatColor.RED + "You do not have permission to use this.");
+                        player.sendMessage(ChatColor.RED + "You do not have permission to use this.");
                     }
+
+                }else if(itemName.equalsIgnoreCase("Exit")){
+                    //Close
+                    player.closeInventory();
                 }
 
                 event.setCancelled(true);
@@ -118,53 +98,46 @@ public class MainClickEvent implements Listener {
 
             //ADD PERM
             if(invName.equals(addPerm)){
-                List<String> lore = event.getCurrentItem().getItemMeta().getLore();
-                ItemMeta meta = event.getInventory().getItem(12).getItemMeta();
-                String pluginName = ChatColor.stripColor(meta.getLore().get(meta.getLore().size() - 2).substring("Plugin: ".length()));
+                //Get lore off confirm item
+                List<String> lore = event.getInventory().getItem(12).getItemMeta().getLore();
+
+                //Object info
+                String[] objectArg = lore.get(1).split(": ");
+                String objectType = ChatColor.stripColor(objectArg[0]); //Group or Player
+                String objectName = ChatColor.stripColor(objectArg[1]); //Name of above
+
+                //Perm
+                String permission = ChatColor.stripColor(lore.get(lore.size() - 1).split(": ")[1]);
 
                 //Check itemName
                 if(itemName.equalsIgnoreCase("CONFIRM")){
+                    //Check if Player or Group
+                    if(objectType.equalsIgnoreCase("PLAYER")){
+                        String worldName = ChatColor.stripColor(lore.get(lore.size() - 2).split(": ")[1]);
 
-                    //Check if player or group
-                    String[] args = lore.get(1).split(": ");
-                    String perm = ChatColor.stripColor(lore.get(lore.size() - 1).substring("Permission: ".length()));
-                    try{
-                        perm = perm.split(" ")[1];
-                    }catch(ArrayIndexOutOfBoundsException e){}
+                        //Remove perm
+                        player.performCommand(String.format("jp p %s p a %s %s", objectName, worldName, permission));
 
-                    if(ChatColor.stripColor(args[0]).equalsIgnoreCase("Player")){
-                        //Add perm to player
-                        String playerName = ChatColor.stripColor(lore.get(1).substring("Player: ".length()));
-                        try{
-                            playerName = playerName.split(" ")[1];
-                        }catch(ArrayIndexOutOfBoundsException e){}
-                        String worldName = ChatColor.stripColor(lore.get(2).substring("World: ".length()));
-                        player.performCommand(String.format("jp p %s p a %s %s", playerName, worldName, perm));
-
-                    }else{
-                        //Add perm to group
-                        String groupName = ChatColor.stripColor(lore.get(1).substring("Group: ".length()));
-                        try{
-                            groupName = groupName.split(" ")[1];
-                        }catch(ArrayIndexOutOfBoundsException e){}
-                        Bukkit.broadcastMessage(groupName);
-                        player.performCommand(String.format("jp g %s p a %s", groupName, perm));
-
-                    }
-                }
-                //Trim down lore
-                if(ChatColor.stripColor(lore.get(1).split(": ")[0]).equalsIgnoreCase("Player")){
-                    while(lore.size() > 3){
-                        lore.remove(lore.size() - 1);
-                    }
-                }else{
-                    while(lore.size() > 2){
-                        lore.remove(lore.size() - 1);
+                    }else if(objectType.equalsIgnoreCase("GROUP")){
+                        //Remove perm
+                        player.performCommand(String.format("jp g %s p a %s", objectName, permission));
                     }
                 }
 
-                //Return to PluginPerm
+                /*Go back to object's perm list
+                if(objectType.equalsIgnoreCase("PLAYER")){
+                    //PlayerPerm
+                    String worldName = ChatColor.stripColor(lore.get(lore.size() - 2).split(": ")[1]);
+                    player.openInventory(new PlayerPerm(plugin).getInventory(worldName, lore));
+
+                }else if(objectType.equalsIgnoreCase("GROUP")){
+                    //GroupPerm
+                    player.openInventory(new GroupPerm(plugin).getInventory(objectName));
+
+                }*/
+                String pluginName = ChatColor.stripColor(lore.get(lore.size() - 1).split(": ")[1]);
                 player.openInventory(new PluginPerm(plugin).getInventory(pluginName, lore));
+
 
                 event.setCancelled(true);
                 return;
@@ -173,54 +146,42 @@ public class MainClickEvent implements Listener {
 
             //REMOVE PERM
             if(invName.equals(removePerm)){
-                List<String> lore = event.getCurrentItem().getItemMeta().getLore();
+                //Get lore off confirm item
+                List<String> lore = event.getInventory().getItem(12).getItemMeta().getLore();
+
+                //Object info
+                String[] objectArg = lore.get(1).split(": ");
+                String objectType = ChatColor.stripColor(objectArg[0]); //Group or Player
+                String objectName = ChatColor.stripColor(objectArg[1]); //Name of above
+
+                //Perm
+                String permission = ChatColor.stripColor(lore.get(lore.size() - 1).split(": ")[1]);
 
                 //Check itemName
                 if(itemName.equalsIgnoreCase("CONFIRM")){
-                    String[] args = lore.get(1).split(": ");
-                    String perm = ChatColor.stripColor(lore.get(lore.size() - 1).substring("Permission: ".length()));
-                    try{
-                        perm = perm.split(" ")[1];
-                    }catch(ArrayIndexOutOfBoundsException e){}
+                    //Check if Player or Group
+                    if(objectType.equalsIgnoreCase("PLAYER")){
+                        String worldName = ChatColor.stripColor(lore.get(lore.size() - 2).split(": ")[1]);
 
-                    //Player
-                    if(ChatColor.stripColor(args[0]).equalsIgnoreCase("Player")){
-                        String playerName = ChatColor.stripColor(lore.get(1).substring("Player: ".length()));
-                        try{
-                            playerName = playerName.split(" ")[1];
-                        }catch(ArrayIndexOutOfBoundsException e){}
-                        String worldName = ChatColor.stripColor(lore.get(2).split(" ")[1]);
-                        player.performCommand(String.format("jp p %s p r %s %s", playerName, worldName, perm));
+                        //Remove perm
+                        player.performCommand(String.format("jp p %s p r %s %s", objectName, worldName, permission));
 
-                    }else{ //Group
-                        String groupName = ChatColor.stripColor(lore.get(1).substring("Group: ".length()));
-                        try{
-                            groupName = groupName.split(" ")[1];
-                        }catch(ArrayIndexOutOfBoundsException e){}
-                        player.performCommand(String.format("jp g %s p r %s", groupName, perm));
+                    }else if(objectType.equalsIgnoreCase("GROUP")){
+                        //Remove perm
+                        player.performCommand(String.format("jp g %s p r %s", objectName, permission));
                     }
                 }
 
-                //Trim down lore
-                if(ChatColor.stripColor(lore.get(1).split(": ")[0]).equalsIgnoreCase("Player")){
-                    while(lore.size() > 3){
-                        lore.remove(lore.size() - 1);
-                    }
-                    String playerName = ChatColor.stripColor(lore.get(1).substring("Player: ".length()));
-                    try{
-                        playerName = playerName.split(" ")[1];
-                    }catch(ArrayIndexOutOfBoundsException e){}
-                    String worldName = ChatColor.stripColor(lore.get(2).split(" ")[1]);
-                    player.openInventory(new PlayerPerm(plugin).getInventory(playerName, worldName));
-                }else{
-                    while(lore.size() > 2){
-                        lore.remove(lore.size() - 1);
-                    }
-                    String groupName = ChatColor.stripColor(lore.get(1).substring("Group: ".length()));
-                    try{
-                        groupName = groupName.split(" ")[1];
-                    }catch(ArrayIndexOutOfBoundsException e){}
-                    player.openInventory(new GroupPerm(plugin).getInventory(groupName));
+                //Go back to object's perm list
+                if(objectType.equalsIgnoreCase("PLAYER")){
+                    //PlayerPerm
+                    String worldName = ChatColor.stripColor(lore.get(lore.size() - 2).split(": ")[1]);
+                    player.openInventory(new PlayerPerm(plugin).getInventory(worldName, lore));
+
+                }else if(objectType.equalsIgnoreCase("GROUP")){
+                    //GroupPerm
+                    player.openInventory(new GroupPerm(plugin).getInventory(objectName));
+
                 }
 
                 event.setCancelled(true);
